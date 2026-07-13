@@ -50,11 +50,13 @@
   h2{font-size:17px; margin:0 0 4px; font-weight:700;}
   .note{color:var(--muted); font-size:12.5px; margin:0 0 16px;}
   .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .day-kpis{grid-template-columns:repeat(3,1fr);}
   .kpi{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px;}
   .kpi .label{font-size:12.5px; color:var(--text-secondary); margin:0 0 8px;}
   .kpi .val{font-size:30px; font-weight:700; letter-spacing:-.01em; line-height:1;}
   .kpi .val .u{font-size:15px; font-weight:600; color:var(--text-secondary); margin-left:3px;}
   .kpi .delta{font-size:12.5px; margin-top:8px; color:var(--good); font-weight:600;}
+  .kpi .delta.flat{color:var(--muted); font-weight:400;}
   .kpi .delta .base{color:var(--muted); font-weight:400;}
   .charts2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
   .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 18px 14px;}
@@ -95,11 +97,29 @@
   tfoot td{font-weight:700; border-top:2px solid var(--baseline); border-bottom:0; background:var(--surface);}
   tfoot td.name{font-weight:700;}
   .zero{color:var(--muted);}
+  .up{color:var(--good); font-weight:700;}
+  .flat{color:var(--muted);}
+  .date-list{display:flex; flex-direction:column; gap:8px;}
+  .date-item{display:grid; grid-template-columns:96px 1fr auto 18px; align-items:center; gap:16px;
+    width:100%; text-align:left; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:14px 18px; cursor:pointer; font-family:inherit; color:var(--text-primary);}
+  .date-item:hover{border-color:var(--kpi-accent); background:rgba(42,120,214,0.05);}
+  .di-date{font-size:16px; font-weight:700;}
+  .di-stat{font-size:13.5px; color:var(--text-secondary); font-variant-numeric:tabular-nums;}
+  .di-delta{font-size:12.5px; color:var(--good); font-weight:600; text-align:right; font-variant-numeric:tabular-nums;}
+  .di-delta.base{color:var(--muted); font-weight:400;}
+  .di-arrow{font-size:18px; color:var(--muted); text-align:right;}
+  .back-btn{background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:7px 14px; cursor:pointer; font-family:inherit; color:var(--text-secondary); font-size:13px;}
+  .back-btn:hover{color:var(--text-primary); border-color:var(--kpi-accent);}
   footer.rpt{margin-top:40px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;}
   footer.rpt code{background:var(--grid); padding:1px 5px; border-radius:4px; font-size:11.5px;}
   @media (max-width:820px){
     .kpis{grid-template-columns:repeat(2,1fr);}
+    .day-kpis{grid-template-columns:repeat(2,1fr);}
     .charts2{grid-template-columns:1fr;}
+    .date-item{grid-template-columns:72px 1fr auto;}
+    .di-arrow{display:none;}
   }
   @media print{
     :root{
@@ -124,58 +144,55 @@
     <p class="sub">資料期間：<span class="js-period"></span>　·　共 <span class="js-npoints"></span> 個資料點（每日一筆累積快照）　·　僅計「語文別＝原住民族語文」</p>
   </header>
 
-  <section id="kpiSec">
-    <h2>整體累積概況</h2>
-    <p class="note">數字為「不含取消選課」之當日累積狀態；成長量以資料期間首日為基準。</p>
-    <div class="kpis" id="kpis"></div>
-  </section>
-
-  <section>
-    <h2>每日累積趨勢</h2>
-    <p class="note">折線維持在「國小／國中／總計」層級。左圖為累積校數，右圖為累積班級數。滑鼠移入可查看各日數值。</p>
-    <div class="legend" id="lineLegend">
-      <span><i class="swatch" style="background:var(--s-prim)"></i>國小</span>
-      <span><i class="swatch" style="background:var(--s-juni)"></i>國中</span>
-      <span><i class="swatch" style="background:var(--s-tot)"></i>總計</span>
-    </div>
-    <div class="charts2">
-      <div class="card">
-        <h3>累積校數</h3>
-        <p class="h-note">不重複學校代碼數</p>
-        <div id="chartSchools"></div>
+  <!-- 第一層：列表頁 -->
+  <div id="viewList">
+    <section>
+      <h2>每日累積趨勢總覽</h2>
+      <p class="note">折線維持在「國小／國中／總計」層級；橫軸為所有有資料的日期。左圖累積校數，右圖累積班級數。滑鼠移入可查看各日數值。</p>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--s-prim)"></i>國小</span>
+        <span><i class="swatch" style="background:var(--s-juni)"></i>國中</span>
+        <span><i class="swatch" style="background:var(--s-tot)"></i>總計</span>
       </div>
-      <div class="card">
-        <h3>累積班級數</h3>
-        <p class="h-note">學校—班級配對列數</p>
-        <div id="chartClasses"></div>
+      <div class="charts2">
+        <div class="card"><h3>累積校數</h3><p class="h-note">不重複學校代碼數</p><div id="chartSchools"></div></div>
+        <div class="card"><h3>累積班級數</h3><p class="h-note">學校—班級配對列數</p><div id="chartClasses"></div></div>
       </div>
-    </div>
-  </section>
+    </section>
+    <section>
+      <h2>各日單日報告</h2>
+      <p class="note">點選任一日期，查看該日的累積 KPI、方言別前 10 大長條圖與方言別明細（含較前一日班級增減）。每列右側為當日總校數／總班級數與較前一日成長。</p>
+      <div class="date-list" id="dateList"></div>
+    </section>
+  </div>
 
-  <section>
-    <h2>最新一日（<span class="js-lastdate"></span>）班級數前 10 大方言別</h2>
-    <p class="note">依 <span class="js-lastdate"></span> 累積班級數排序，橫向長條。數值為國小＋國中合計班級數。</p>
-    <div class="card">
-      <div id="chartBar"></div>
-    </div>
-  </section>
-
-  <section>
-    <h2>逐日 × 方言別 明細數據表</h2>
-    <p class="note">共 <span id="dcount"></span> 種方言別（原住民族語文-方言別欄位），依最新一日班級數由多至少排列。可切換顯示「校數」或「班級數」，表格可左右捲動核對。</p>
-    <div class="tbl-controls">
-      <div class="seg" id="metricSeg">
-        <button data-m="classes" class="on">班級數</button>
-        <button data-m="schools">校數</button>
-      </div>
-    </div>
-    <div class="tbl-scroll">
-      <table id="detailTbl"></table>
-    </div>
-  </section>
+  <!-- 第二層：單日報告 -->
+  <div id="viewDay" style="display:none;">
+    <button class="back-btn" id="backBtn">← 返回列表</button>
+    <header class="rpt" style="margin-top:14px; margin-bottom:20px;">
+      <p class="eyebrow">單日報告</p>
+      <h1 id="dayTitle" style="font-size:23px;"></h1>
+      <p class="sub" id="daySub"></p>
+    </header>
+    <section style="margin-top:10px;">
+      <h2>當日累積 KPI</h2>
+      <p class="note">該日累積校數與班級數（不含取消選課）；每張卡加註較前一日增減。</p>
+      <div class="kpis day-kpis" id="dayKpis"></div>
+    </section>
+    <section>
+      <h2>當日方言別班級數前 10 大</h2>
+      <p class="note">依該日累積班級數排序，橫向長條。數值為國小＋國中合計班級數。</p>
+      <div class="card"><div id="dayBar"></div></div>
+    </section>
+    <section>
+      <h2>當日方言別明細</h2>
+      <p class="note">該日各方言別（原住民族語文-方言別）× 國小／國中／小計 的校數與班級數，末欄為較前一日班級增減（首日顯示 -）。</p>
+      <div class="tbl-scroll"><table id="dayTbl"></table></div>
+    </section>
+  </div>
 
   <footer class="rpt">
-    <p>資料來源：後台「115學年度第三階段選課清單【全】（不含取消選課）」每日原始快照（存於 <code>選課資料每日監控\原始快照\</code>）。同一天有多份快照時採當日較晚版本為準。<br>
+    <p>本頁為兩層結構：列表頁看跨日趨勢與各日概況，點日期進入單日報告。資料來源：後台「115學年度第三階段選課清單【全】（不含取消選課）」每日原始快照；同一天有多份快照時採當日較晚版本為準。<br>
     計算規則：校數＝分組內不重複「學校代碼」數；班級數＝分組資料列數；教育階段取「學校級別」欄位；方言別取「原住民族語文-方言別」欄位；僅計語文別＝原住民族語文。<br>
     交叉驗證：國小／國中彙總逐日對上既定基準；各方言別班級數加總＝國小＋國中彙總；每分組校數 ≤ 班級數；逐日累積數皆遞增。<br>
     本報表由 generate_report.ps1 於 <span class="js-genat"></span> 自動產生。</p>
@@ -185,8 +202,7 @@
 <div class="tt" id="tooltip"></div>
 
 <script>
-const DATA = {"dateLabels":["7/6","7/7","7/8","7/9","7/10","7/12","7/13"],"periodText":"2026 年 7 月 6 日 – 7 月 13 日","nPoints":7,"genAt":"2026-07-13 09:22","primSchools":[136,153,259,279,289,293,303],"primClasses":[362,403,720,793,811,819,835],"juniSchools":[28,33,85,99,105,105,108],"juniClasses":[57,67,193,245,260,260,280],"totSchools":[164,186,344,378,394,398,411],"totClasses":[419,470,913,1038,1071,1079,1115],"dialects":[{"name":"海岸阿美語","days":[[30,58,6,10],[32,60,6,10],[60,104,17,26],[64,112,24,37],[64,111,27,40],[64,111,27,40],[66,113,29,50]],"latestClasses":163,"latestSchools":95},{"name":"賽考利克泰雅語","days":[[31,45,4,4],[33,48,5,6],[58,104,16,18],[62,111,20,24],[63,112,20,24],[63,112,20,24],[63,112,21,25]],"latestClasses":137,"latestSchools":84},{"name":"郡群布農語","days":[[26,40,2,3],[29,44,2,3],[50,82,12,17],[53,85,16,21],[57,90,17,22],[57,90,17,22],[59,93,18,23]],"latestClasses":116,"latestSchools":77},{"name":"南排灣語","days":[[15,20,5,6],[19,27,6,7],[32,44,15,16],[37,50,16,17],[38,51,17,18],[38,51,17,18],[39,52,18,19]],"latestClasses":71,"latestSchools":57},{"name":"東排灣語","days":[[13,19,2,2],[15,22,3,3],[30,45,9,9],[35,51,11,12],[38,55,11,12],[38,55,11,12],[41,58,11,12]],"latestClasses":70,"latestSchools":52},{"name":"太魯閣語","days":[[18,21,1,1],[21,25,1,1],[30,37,8,9],[35,45,8,9],[36,46,8,9],[37,47,8,9],[38,48,9,10]],"latestClasses":58,"latestSchools":47},{"name":"秀姑巒阿美語","days":[[10,10,3,4],[11,11,3,4],[23,28,11,15],[26,33,14,20],[26,33,14,20],[26,33,14,20],[27,34,14,20]],"latestClasses":54,"latestSchools":41},{"name":"馬蘭阿美語","days":[[11,12,3,3],[12,13,3,3],[17,20,10,10],[19,26,11,11],[20,27,12,12],[20,27,12,12],[21,28,12,12]],"latestClasses":40,"latestSchools":33},{"name":"澤敖利泰雅語","days":[[4,5,0,0],[4,5,1,2],[17,19,2,3],[20,23,7,9],[21,24,8,10],[21,24,8,10],[22,25,9,11]],"latestClasses":36,"latestSchools":31},{"name":"巒群布農語","days":[[12,19,1,1],[12,19,1,1],[18,25,3,3],[18,25,4,4],[19,26,5,5],[19,26,5,5],[19,26,6,6]],"latestClasses":32,"latestSchools":25},{"name":"南勢阿美語","days":[[8,9,1,1],[9,10,1,1],[19,24,2,2],[20,26,2,2],[21,27,2,2],[21,27,2,2],[21,27,2,2]],"latestClasses":29,"latestSchools":23},{"name":"賽夏語","days":[[8,9,0,0],[9,10,0,0],[17,19,2,2],[19,21,3,3],[20,22,3,3],[20,22,3,3],[20,22,3,3]],"latestClasses":25,"latestSchools":23},{"name":"北排灣語","days":[[6,8,2,2],[6,8,2,2],[10,13,7,7],[11,15,8,8],[12,16,8,8],[12,16,8,8],[12,16,8,8]],"latestClasses":24,"latestSchools":20},{"name":"汶水泰雅語","days":[[5,7,0,0],[6,8,1,1],[11,13,2,2],[13,16,4,5],[13,16,4,5],[13,16,4,5],[13,16,4,5]],"latestClasses":21,"latestSchools":17},{"name":"卓群布農語","days":[[6,11,1,1],[6,11,1,1],[8,13,3,3],[9,14,3,3],[9,14,4,4],[9,14,4,4],[9,14,4,4]],"latestClasses":18,"latestSchools":13},{"name":"中排灣語","days":[[4,4,0,0],[5,6,0,0],[10,14,1,1],[11,15,2,2],[11,15,2,2],[11,15,2,2],[11,15,2,2]],"latestClasses":17,"latestSchools":13},{"name":"雅美(達悟)語","days":[[4,5,2,2],[5,6,2,2],[9,10,2,2],[10,11,2,2],[10,11,2,2],[11,13,2,2],[12,14,2,2]],"latestClasses":16,"latestSchools":14},{"name":"德鹿谷賽德克語","days":[[8,9,0,0],[9,11,0,0],[10,12,0,0],[10,12,0,0],[10,12,0,0],[11,14,0,0],[11,14,0,0]],"latestClasses":14,"latestSchools":11},{"name":"霧臺魯凱語","days":[[0,0,1,1],[0,0,1,1],[4,4,4,6],[4,4,4,6],[4,4,5,9],[4,4,5,9],[4,4,5,9]],"latestClasses":13,"latestSchools":9},{"name":"鄒語","days":[[3,3,1,1],[5,6,1,1],[8,9,4,4],[8,9,4,4],[8,9,4,4],[8,9,4,4],[8,9,4,4]],"latestClasses":13,"latestSchools":12},{"name":"都達賽德克語","days":[[3,3,0,0],[3,3,0,0],[3,3,3,3],[5,6,3,3],[5,6,4,4],[5,6,4,4],[5,6,6,6]],"latestClasses":12,"latestSchools":11},{"name":"德固達雅賽德克語","days":[[3,4,1,1],[3,4,2,2],[4,6,2,2],[5,8,3,3],[5,8,3,3],[5,8,3,3],[5,8,3,3]],"latestClasses":11,"latestSchools":8},{"name":"知本卑南語","days":[[3,4,3,3],[3,4,3,3],[4,6,4,4],[4,6,4,4],[5,7,4,4],[5,7,4,4],[5,7,4,4]],"latestClasses":11,"latestSchools":9},{"name":"東魯凱語","days":[[2,4,2,2],[3,5,2,2],[4,6,3,3],[4,6,3,3],[4,6,3,3],[5,7,3,3],[5,7,4,4]],"latestClasses":11,"latestSchools":9},{"name":"建和卑南語","days":[[3,4,2,2],[3,4,2,2],[3,4,4,4],[3,4,5,5],[3,4,5,5],[3,4,5,5],[3,4,5,5]],"latestClasses":9,"latestSchools":8},{"name":"西群卑南語","days":[[5,6,0,0],[5,6,0,0],[5,6,1,1],[6,7,1,1],[6,7,2,2],[6,7,2,2],[6,7,2,2]],"latestClasses":9,"latestSchools":8},{"name":"卡群布農語","days":[[3,3,0,0],[3,3,0,0],[6,8,1,1],[6,8,1,1],[6,8,1,1],[6,8,1,1],[6,8,1,1]],"latestClasses":9,"latestSchools":7},{"name":"丹群布農語","days":[[3,4,0,0],[3,4,0,0],[4,5,0,0],[4,5,4,4],[4,5,4,4],[4,5,4,4],[4,5,4,4]],"latestClasses":9,"latestSchools":8},{"name":"撒奇萊雅語","days":[[2,2,2,2],[2,2,3,3],[2,2,5,5],[3,3,5,5],[3,3,5,5],[3,3,5,5],[3,3,5,5]],"latestClasses":8,"latestSchools":8},{"name":"宜蘭澤敖利泰雅語","days":[[1,1,0,0],[2,2,0,0],[5,5,1,1],[6,6,1,1],[6,6,1,1],[6,6,1,1],[7,7,1,1]],"latestClasses":8,"latestSchools":8},{"name":"南王卑南語","days":[[2,2,1,1],[3,3,1,1],[5,5,1,1],[5,5,2,2],[5,5,2,2],[5,5,2,2],[5,5,2,2]],"latestClasses":7,"latestSchools":7},{"name":"四季泰雅語","days":[[3,4,0,0],[4,5,0,0],[5,6,0,0],[5,6,0,0],[5,6,0,0],[6,7,0,0],[6,7,0,0]],"latestClasses":7,"latestSchools":6},{"name":"大武魯凱語","days":[[1,1,1,1],[1,1,1,1],[2,3,2,3],[2,3,2,3],[2,3,2,3],[2,3,2,3],[2,3,3,4]],"latestClasses":7,"latestSchools":5},{"name":"恆春阿美語","days":[[1,1,1,1],[1,1,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1]],"latestClasses":6,"latestSchools":6},{"name":"萬山魯凱語","days":[[1,1,0,0],[1,1,0,0],[3,4,0,0],[3,4,0,0],[3,4,0,0],[3,4,0,0],[4,5,0,0]],"latestClasses":5,"latestSchools":4},{"name":"萬大泰雅語","days":[[1,1,0,0],[1,1,0,0],[2,2,2,2],[2,2,2,2],[2,2,2,2],[3,3,2,2],[3,3,2,2]],"latestClasses":5,"latestSchools":5},{"name":"邵語","days":[[2,2,1,1],[2,2,1,1],[2,2,1,1],[2,2,2,2],[2,2,3,3],[2,2,3,3],[2,2,3,3]],"latestClasses":5,"latestSchools":5},{"name":"噶瑪蘭語","days":[[1,1,0,0],[1,1,0,0],[2,2,2,2],[2,2,2,2],[2,2,2,2],[2,2,2,2],[2,2,2,2]],"latestClasses":4,"latestSchools":4},{"name":"多納魯凱語","days":[[0,0,1,1],[1,1,1,1],[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]],"latestClasses":3,"latestSchools":3},{"name":"茂林魯凱語","days":[[0,0,0,0],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],"latestClasses":1,"latestSchools":1},{"name":"卡那卡那富語","days":[[0,0,0,0],[0,0,0,0],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],"latestClasses":1,"latestSchools":1}]};
-
+const DATA = {"dateLabels":["7/6","7/7","7/8","7/9","7/10","7/12","7/13"],"periodText":"2026 年 7 月 6 日 – 7 月 13 日","nPoints":7,"genAt":"2026-07-13 14:13","primSchools":[136,153,259,279,289,293,303],"primClasses":[362,403,720,793,811,819,835],"juniSchools":[28,33,85,99,105,105,108],"juniClasses":[57,67,193,245,260,260,280],"totSchools":[164,186,344,378,394,398,411],"totClasses":[419,470,913,1038,1071,1079,1115],"dialects":[{"name":"海岸阿美語","days":[[30,58,6,10],[32,60,6,10],[60,104,17,26],[64,112,24,37],[64,111,27,40],[64,111,27,40],[66,113,29,50]],"latestClasses":163,"latestSchools":95},{"name":"賽考利克泰雅語","days":[[31,45,4,4],[33,48,5,6],[58,104,16,18],[62,111,20,24],[63,112,20,24],[63,112,20,24],[63,112,21,25]],"latestClasses":137,"latestSchools":84},{"name":"郡群布農語","days":[[26,40,2,3],[29,44,2,3],[50,82,12,17],[53,85,16,21],[57,90,17,22],[57,90,17,22],[59,93,18,23]],"latestClasses":116,"latestSchools":77},{"name":"南排灣語","days":[[15,20,5,6],[19,27,6,7],[32,44,15,16],[37,50,16,17],[38,51,17,18],[38,51,17,18],[39,52,18,19]],"latestClasses":71,"latestSchools":57},{"name":"東排灣語","days":[[13,19,2,2],[15,22,3,3],[30,45,9,9],[35,51,11,12],[38,55,11,12],[38,55,11,12],[41,58,11,12]],"latestClasses":70,"latestSchools":52},{"name":"太魯閣語","days":[[18,21,1,1],[21,25,1,1],[30,37,8,9],[35,45,8,9],[36,46,8,9],[37,47,8,9],[38,48,9,10]],"latestClasses":58,"latestSchools":47},{"name":"秀姑巒阿美語","days":[[10,10,3,4],[11,11,3,4],[23,28,11,15],[26,33,14,20],[26,33,14,20],[26,33,14,20],[27,34,14,20]],"latestClasses":54,"latestSchools":41},{"name":"馬蘭阿美語","days":[[11,12,3,3],[12,13,3,3],[17,20,10,10],[19,26,11,11],[20,27,12,12],[20,27,12,12],[21,28,12,12]],"latestClasses":40,"latestSchools":33},{"name":"澤敖利泰雅語","days":[[4,5,0,0],[4,5,1,2],[17,19,2,3],[20,23,7,9],[21,24,8,10],[21,24,8,10],[22,25,9,11]],"latestClasses":36,"latestSchools":31},{"name":"巒群布農語","days":[[12,19,1,1],[12,19,1,1],[18,25,3,3],[18,25,4,4],[19,26,5,5],[19,26,5,5],[19,26,6,6]],"latestClasses":32,"latestSchools":25},{"name":"南勢阿美語","days":[[8,9,1,1],[9,10,1,1],[19,24,2,2],[20,26,2,2],[21,27,2,2],[21,27,2,2],[21,27,2,2]],"latestClasses":29,"latestSchools":23},{"name":"賽夏語","days":[[8,9,0,0],[9,10,0,0],[17,19,2,2],[19,21,3,3],[20,22,3,3],[20,22,3,3],[20,22,3,3]],"latestClasses":25,"latestSchools":23},{"name":"北排灣語","days":[[6,8,2,2],[6,8,2,2],[10,13,7,7],[11,15,8,8],[12,16,8,8],[12,16,8,8],[12,16,8,8]],"latestClasses":24,"latestSchools":20},{"name":"汶水泰雅語","days":[[5,7,0,0],[6,8,1,1],[11,13,2,2],[13,16,4,5],[13,16,4,5],[13,16,4,5],[13,16,4,5]],"latestClasses":21,"latestSchools":17},{"name":"卓群布農語","days":[[6,11,1,1],[6,11,1,1],[8,13,3,3],[9,14,3,3],[9,14,4,4],[9,14,4,4],[9,14,4,4]],"latestClasses":18,"latestSchools":13},{"name":"中排灣語","days":[[4,4,0,0],[5,6,0,0],[10,14,1,1],[11,15,2,2],[11,15,2,2],[11,15,2,2],[11,15,2,2]],"latestClasses":17,"latestSchools":13},{"name":"雅美(達悟)語","days":[[4,5,2,2],[5,6,2,2],[9,10,2,2],[10,11,2,2],[10,11,2,2],[11,13,2,2],[12,14,2,2]],"latestClasses":16,"latestSchools":14},{"name":"德鹿谷賽德克語","days":[[8,9,0,0],[9,11,0,0],[10,12,0,0],[10,12,0,0],[10,12,0,0],[11,14,0,0],[11,14,0,0]],"latestClasses":14,"latestSchools":11},{"name":"霧臺魯凱語","days":[[0,0,1,1],[0,0,1,1],[4,4,4,6],[4,4,4,6],[4,4,5,9],[4,4,5,9],[4,4,5,9]],"latestClasses":13,"latestSchools":9},{"name":"鄒語","days":[[3,3,1,1],[5,6,1,1],[8,9,4,4],[8,9,4,4],[8,9,4,4],[8,9,4,4],[8,9,4,4]],"latestClasses":13,"latestSchools":12},{"name":"都達賽德克語","days":[[3,3,0,0],[3,3,0,0],[3,3,3,3],[5,6,3,3],[5,6,4,4],[5,6,4,4],[5,6,6,6]],"latestClasses":12,"latestSchools":11},{"name":"德固達雅賽德克語","days":[[3,4,1,1],[3,4,2,2],[4,6,2,2],[5,8,3,3],[5,8,3,3],[5,8,3,3],[5,8,3,3]],"latestClasses":11,"latestSchools":8},{"name":"知本卑南語","days":[[3,4,3,3],[3,4,3,3],[4,6,4,4],[4,6,4,4],[5,7,4,4],[5,7,4,4],[5,7,4,4]],"latestClasses":11,"latestSchools":9},{"name":"東魯凱語","days":[[2,4,2,2],[3,5,2,2],[4,6,3,3],[4,6,3,3],[4,6,3,3],[5,7,3,3],[5,7,4,4]],"latestClasses":11,"latestSchools":9},{"name":"建和卑南語","days":[[3,4,2,2],[3,4,2,2],[3,4,4,4],[3,4,5,5],[3,4,5,5],[3,4,5,5],[3,4,5,5]],"latestClasses":9,"latestSchools":8},{"name":"西群卑南語","days":[[5,6,0,0],[5,6,0,0],[5,6,1,1],[6,7,1,1],[6,7,2,2],[6,7,2,2],[6,7,2,2]],"latestClasses":9,"latestSchools":8},{"name":"卡群布農語","days":[[3,3,0,0],[3,3,0,0],[6,8,1,1],[6,8,1,1],[6,8,1,1],[6,8,1,1],[6,8,1,1]],"latestClasses":9,"latestSchools":7},{"name":"丹群布農語","days":[[3,4,0,0],[3,4,0,0],[4,5,0,0],[4,5,4,4],[4,5,4,4],[4,5,4,4],[4,5,4,4]],"latestClasses":9,"latestSchools":8},{"name":"撒奇萊雅語","days":[[2,2,2,2],[2,2,3,3],[2,2,5,5],[3,3,5,5],[3,3,5,5],[3,3,5,5],[3,3,5,5]],"latestClasses":8,"latestSchools":8},{"name":"宜蘭澤敖利泰雅語","days":[[1,1,0,0],[2,2,0,0],[5,5,1,1],[6,6,1,1],[6,6,1,1],[6,6,1,1],[7,7,1,1]],"latestClasses":8,"latestSchools":8},{"name":"南王卑南語","days":[[2,2,1,1],[3,3,1,1],[5,5,1,1],[5,5,2,2],[5,5,2,2],[5,5,2,2],[5,5,2,2]],"latestClasses":7,"latestSchools":7},{"name":"四季泰雅語","days":[[3,4,0,0],[4,5,0,0],[5,6,0,0],[5,6,0,0],[5,6,0,0],[6,7,0,0],[6,7,0,0]],"latestClasses":7,"latestSchools":6},{"name":"大武魯凱語","days":[[1,1,1,1],[1,1,1,1],[2,3,2,3],[2,3,2,3],[2,3,2,3],[2,3,2,3],[2,3,3,4]],"latestClasses":7,"latestSchools":5},{"name":"恆春阿美語","days":[[1,1,1,1],[1,1,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1],[5,5,1,1]],"latestClasses":6,"latestSchools":6},{"name":"萬山魯凱語","days":[[1,1,0,0],[1,1,0,0],[3,4,0,0],[3,4,0,0],[3,4,0,0],[3,4,0,0],[4,5,0,0]],"latestClasses":5,"latestSchools":4},{"name":"萬大泰雅語","days":[[1,1,0,0],[1,1,0,0],[2,2,2,2],[2,2,2,2],[2,2,2,2],[3,3,2,2],[3,3,2,2]],"latestClasses":5,"latestSchools":5},{"name":"邵語","days":[[2,2,1,1],[2,2,1,1],[2,2,1,1],[2,2,2,2],[2,2,3,3],[2,2,3,3],[2,2,3,3]],"latestClasses":5,"latestSchools":5},{"name":"噶瑪蘭語","days":[[1,1,0,0],[1,1,0,0],[2,2,2,2],[2,2,2,2],[2,2,2,2],[2,2,2,2],[2,2,2,2]],"latestClasses":4,"latestSchools":4},{"name":"多納魯凱語","days":[[0,0,1,1],[1,1,1,1],[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]],"latestClasses":3,"latestSchools":3},{"name":"茂林魯凱語","days":[[0,0,0,0],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],"latestClasses":1,"latestSchools":1},{"name":"卡那卡那富語","days":[[0,0,0,0],[0,0,0,0],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],"latestClasses":1,"latestSchools":1}]};
 function cssv(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 const NS="http://www.w3.org/2000/svg";
 function el(tag,attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -199,7 +215,6 @@ function showTip(html,x,y){
   tooltip.style.left=px+'px'; tooltip.style.top=py+'px';
 }
 function hideTip(){ tooltip.style.opacity='0'; }
-
 function fillDynamic(){
   const n=DATA.dateLabels.length-1;
   document.querySelectorAll('.js-period').forEach(e=>e.textContent=DATA.periodText);
@@ -208,24 +223,6 @@ function fillDynamic(){
   document.querySelectorAll('.js-firstdate').forEach(e=>e.textContent=DATA.dateLabels[0]);
   document.querySelectorAll('.js-genat').forEach(e=>e.textContent=DATA.genAt);
 }
-
-function renderKPI(){
-  const n=DATA.dateLabels.length-1;
-  const f=DATA.dateLabels[0], L=DATA.dateLabels[n];
-  const s0=DATA.totSchools[0], s1=DATA.totSchools[n];
-  const c0=DATA.totClasses[0], c1=DATA.totClasses[n];
-  const ds=s1-s0, dc=c1-c0; const ps=(ds/s0*100), pc=(dc/c0*100);
-  const cards=[
-    {label:`總累積校數（${L}）`, val:s1, unit:'校', delta:`自 ${f} 起 +${ds} 校（+${ps.toFixed(1)}%）`, base:`基準 ${s0} 校`},
-    {label:`總累積班級數（${L}）`, val:c1, unit:'班', delta:`自 ${f} 起 +${dc} 班（+${pc.toFixed(1)}%）`, base:`基準 ${c0} 班`},
-    {label:'校數成長量', val:'+'+ds, unit:'校', delta:`＋${ps.toFixed(1)}%`, base:`${f}：${s0} → ${L}：${s1}`},
-    {label:'班級數成長量', val:'+'+dc, unit:'班', delta:`＋${pc.toFixed(1)}%`, base:`${f}：${c0} → ${L}：${c1}`}
-  ];
-  document.getElementById('kpis').innerHTML=cards.map(k=>`<div class="kpi"><p class="label">${k.label}</p>
-    <div class="val">${k.val}<span class="u">${k.unit}</span></div>
-    <div class="delta">▲ ${k.delta}<br><span class="base">${k.base}</span></div></div>`).join('');
-}
-
 function lineChart(mountId, series, dates){
   const mount=document.getElementById(mountId); mount.innerHTML='';
   const W=520,H=300, mL=44,mR=48,mT=16,mB=34;
@@ -274,10 +271,8 @@ function lineChart(mountId, series, dates){
   });
   mount.appendChild(svg);
 }
-
-function barChart(mountId){
+function barItems(mountId, items){
   const mount=document.getElementById(mountId); mount.innerHTML='';
-  const items=DATA.dialects.slice(0,10).map(d=>({name:d.name,value:d.latestClasses,schools:d.latestSchools}));
   const W=760, rowH=30, mT=8, mB=8, mL=140, mR=54;
   const H=mT+mB+items.length*rowH;
   const maxV=Math.max(1,...items.map(i=>i.value));
@@ -308,35 +303,9 @@ function barChart(mountId){
   mount.appendChild(svg);
 }
 
-let curMetric='classes';
-function renderTable(){
-  const t=document.getElementById('detailTbl'); const dates=DATA.dateLabels;
-  const pIdx = curMetric==='classes'?1:0; const jIdx = curMetric==='classes'?3:2;
-  let head='<thead><tr><th class="namehd" rowspan="2">方言別</th>';
-  dates.forEach(d=>{ head+=`<th class="grp" colspan="3">${d}</th>`; });
-  head+='</tr><tr>';
-  dates.forEach(()=>{ head+='<th class="sub">國小</th><th>國中</th><th>小計</th>'; });
-  head+='</tr></thead>';
-  let body='<tbody>';
-  DATA.dialects.forEach(dl=>{
-    body+=`<tr><td class="name">${dl.name}</td>`;
-    dates.forEach((d,i)=>{ const p=dl.days[i][pIdx], j=dl.days[i][jIdx], s=p+j;
-      body+=`<td class="${p?'':'zero'}">${p}</td><td class="${j?'':'zero'}">${j}</td><td class="${s?'':'zero'}"><b>${s}</b></td>`; });
-    body+='</tr>';
-  });
-  body+='</tbody>';
-  const primArr = curMetric==='classes'?DATA.primClasses:DATA.primSchools;
-  const juniArr = curMetric==='classes'?DATA.juniClasses:DATA.juniSchools;
-  const totArr  = curMetric==='classes'?DATA.totClasses:DATA.totSchools;
-  let foot='<tfoot><tr><td class="name">彙總（'+(curMetric==='classes'?'班級':'校')+'）</td>';
-  dates.forEach((d,i)=>{ foot+=`<td>${primArr[i]}</td><td>${juniArr[i]}</td><td>${totArr[i]}</td>`; });
-  foot+='</tr></tfoot>';
-  t.innerHTML=head+body+foot;
-  document.getElementById('dcount').textContent=DATA.dialects.length;
-}
+let curDay=null;
 
-function drawAll(){
-  renderKPI();
+function drawTrend(){
   lineChart('chartSchools',[
     {name:'國小',color:'--s-prim',values:DATA.primSchools},
     {name:'國中',color:'--s-juni',values:DATA.juniSchools},
@@ -347,22 +316,122 @@ function drawAll(){
     {name:'國中',color:'--s-juni',values:DATA.juniClasses},
     {name:'總計',color:'--s-tot',values:DATA.totClasses}
   ],DATA.dateLabels);
-  barChart('chartBar'); renderTable();
 }
-fillDynamic();
-drawAll();
 
-document.getElementById('metricSeg').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  curMetric=b.dataset.m;
-  document.querySelectorAll('#metricSeg button').forEach(x=>x.classList.toggle('on',x===b));
-  renderTable();
-});
+function renderDateList(){
+  const box=document.getElementById('dateList');
+  let html='';
+  DATA.dateLabels.forEach((d,i)=>{
+    const s=DATA.totSchools[i], c=DATA.totClasses[i];
+    let delta;
+    if(i===0){ delta='<span class="di-delta base">（資料期間基準日）</span>'; }
+    else{ const ds=s-DATA.totSchools[i-1], dc=c-DATA.totClasses[i-1];
+      delta=`<span class="di-delta">較前一日 +${ds} 校　+${dc} 班</span>`; }
+    html+=`<button class="date-item" data-i="${i}">
+      <span class="di-date">${d}</span>
+      <span class="di-stat">${s} 校 ／ ${c} 班</span>
+      ${delta}
+      <span class="di-arrow">›</span></button>`;
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('.date-item').forEach(b=> b.addEventListener('click',()=>showDay(+b.dataset.i)));
+}
+
+function renderDayKPI(i){
+  const prev = i>0 ? i-1 : null;
+  const rows=[
+    {lbl:'國小 累積校數', v:DATA.primSchools[i], p:(prev!==null?DATA.primSchools[prev]:null), u:'校'},
+    {lbl:'國小 累積班級數', v:DATA.primClasses[i], p:(prev!==null?DATA.primClasses[prev]:null), u:'班'},
+    {lbl:'國中 累積校數', v:DATA.juniSchools[i], p:(prev!==null?DATA.juniSchools[prev]:null), u:'校'},
+    {lbl:'國中 累積班級數', v:DATA.juniClasses[i], p:(prev!==null?DATA.juniClasses[prev]:null), u:'班'},
+    {lbl:'總計 累積校數', v:DATA.totSchools[i], p:(prev!==null?DATA.totSchools[prev]:null), u:'校'},
+    {lbl:'總計 累積班級數', v:DATA.totClasses[i], p:(prev!==null?DATA.totClasses[prev]:null), u:'班'}
+  ];
+  document.getElementById('dayKpis').innerHTML=rows.map(r=>{
+    let deltaCls='delta', deltaTxt;
+    if(r.p===null){ deltaCls='delta flat'; deltaTxt='基準日（無前一日可比）'; }
+    else{ const dd=r.v-r.p;
+      if(dd>0) deltaTxt=`▲ 較前一日 +${dd} ${r.u}`;
+      else if(dd===0){ deltaCls='delta flat'; deltaTxt=`較前一日 持平（±0 ${r.u}）`; }
+      else{ deltaCls='delta flat'; deltaTxt=`▼ 較前一日 ${dd} ${r.u}`; }
+    }
+    return `<div class="kpi"><p class="label">${r.lbl}</p>
+      <div class="val">${r.v}<span class="u">${r.u}</span></div>
+      <div class="${deltaCls}">${deltaTxt}</div></div>`;
+  }).join('');
+}
+
+function dayBar(i){
+  const items=DATA.dialects.map(d=>({name:d.name, value:d.days[i][1]+d.days[i][3], schools:d.days[i][0]+d.days[i][2]}))
+    .sort((a,b)=> b.value-a.value || (a.name<b.name?-1:1)).slice(0,10);
+  barItems('dayBar', items);
+}
+
+function renderDayTable(i){
+  const prev = i>0 ? i-1 : null;
+  const rows=DATA.dialects.map(d=>{
+    const cur=d.days[i]; const cCur=cur[1]+cur[3];
+    const cPrev = (prev!==null)? (d.days[prev][1]+d.days[prev][3]) : null;
+    return {name:d.name, cur:cur, cCur:cCur, cPrev:cPrev};
+  }).sort((a,b)=> b.cCur-a.cCur || (a.name<b.name?-1:1));
+  let head=`<thead><tr><th class="namehd" rowspan="2">方言別</th>
+    <th class="grp" colspan="2">國小</th><th class="grp" colspan="2">國中</th><th class="grp" colspan="2">小計</th>
+    <th rowspan="2">較前一日<br>班級增減</th></tr>
+    <tr><th class="sub">校</th><th>班</th><th class="sub">校</th><th>班</th><th class="sub">校</th><th>班</th></tr></thead>`;
+  let body='<tbody>';
+  rows.forEach(r=>{
+    const pS=r.cur[0], pC=r.cur[1], jS=r.cur[2], jC=r.cur[3], sS=pS+jS, sC=pC+jC;
+    let dcell;
+    if(r.cPrev===null){ dcell='<span class="flat">-</span>'; }
+    else{ const dd=sC-r.cPrev;
+      if(dd>0) dcell=`<span class="up">+${dd}</span>`;
+      else if(dd===0) dcell='<span class="flat">0</span>';
+      else dcell=`<span class="up" style="color:var(--s-juni)">${dd}</span>`;
+    }
+    body+=`<tr><td class="name">${r.name}</td>
+      <td class="${pS?'':'zero'}">${pS}</td><td class="${pC?'':'zero'}">${pC}</td>
+      <td class="${jS?'':'zero'}">${jS}</td><td class="${jC?'':'zero'}">${jC}</td>
+      <td class="${sS?'':'zero'}">${sS}</td><td class="${sC?'':'zero'}"><b>${sC}</b></td>
+      <td>${dcell}</td></tr>`;
+  });
+  body+='</tbody>';
+  const pfS=DATA.primSchools[i], pfC=DATA.primClasses[i], jfS=DATA.juniSchools[i], jfC=DATA.juniClasses[i];
+  const foot=`<tfoot><tr><td class="name">彙總</td>
+    <td>${pfS}</td><td>${pfC}</td><td>${jfS}</td><td>${jfC}</td>
+    <td>${pfS+jfS}</td><td>${pfC+jfC}</td>
+    <td>${prev!==null?('+'+((pfC+jfC)-(DATA.primClasses[prev]+DATA.juniClasses[prev]))):'<span class="flat">-</span>'}</td></tr></tfoot>`;
+  document.getElementById('dayTbl').innerHTML=head+body+foot;
+}
+
+function showDay(i){
+  curDay=i;
+  document.getElementById('dayTitle').textContent=DATA.dateLabels[i]+'　單日報告';
+  document.getElementById('daySub').textContent = (i>0)
+    ? `累積至 ${DATA.dateLabels[i]}（不含取消選課）　·　含較前一日增減`
+    : `累積至 ${DATA.dateLabels[i]}（不含取消選課）　·　資料期間基準日`;
+  renderDayKPI(i); dayBar(i); renderDayTable(i);
+  document.getElementById('viewList').style.display='none';
+  document.getElementById('viewDay').style.display='block';
+  window.scrollTo(0,0);
+}
+function showList(){
+  curDay=null;
+  document.getElementById('viewDay').style.display='none';
+  document.getElementById('viewList').style.display='block';
+  window.scrollTo(0,0);
+}
+
+fillDynamic();
+renderDateList();
+drawTrend();
+
+document.getElementById('backBtn').addEventListener('click',showList);
 document.getElementById('themeBtn').addEventListener('click',()=>{
   const cur=document.documentElement.getAttribute('data-theme');
   const sysDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
   let next; if(!cur) next=sysDark?'light':'dark'; else next=cur==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next); drawAll();
+  document.documentElement.setAttribute('data-theme',next);
+  drawTrend(); if(curDay!==null){ dayBar(curDay); renderDayKPI(curDay); renderDayTable(curDay); }
 });
 </script>
 </body>
