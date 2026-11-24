@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
@@ -8,26 +8,26 @@
   :root{
     --page:#f9f9f7; --surface:#fcfcfb; --text-primary:#0b0b0b; --text-secondary:#52514e;
     --muted:#898781; --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
-    --good:#006300; --s-prim:#2a78d6; --s-juni:#eb6834; --s-tot:#4a3aa7; --s-bar:#2a78d6;
+    --good:#006300; --s-l0:#2a78d6; --s-l1:#eb6834; --s-l2:#1f9d6a; --s-l3:#c2417f; --s-tot:#4a3aa7; --s-bar:#2a78d6;
     --kpi-accent:#2a78d6;
   }
   @media (prefers-color-scheme: dark){
     :root{
       --page:#0d0d0d; --surface:#1a1a19; --text-primary:#ffffff; --text-secondary:#c3c2b7;
       --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
-      --good:#0ca30c; --s-prim:#3987e5; --s-juni:#d95926; --s-tot:#9085e9; --s-bar:#3987e5;
+      --good:#0ca30c; --s-l0:#3987e5; --s-l1:#d95926; --s-l2:#2fb37d; --s-l3:#d9609a; --s-tot:#9085e9; --s-bar:#3987e5;
       --kpi-accent:#3987e5;
     }
   }
   :root[data-theme="light"]{
     --page:#f9f9f7; --surface:#fcfcfb; --text-primary:#0b0b0b; --text-secondary:#52514e;
     --muted:#898781; --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
-    --good:#006300; --s-prim:#2a78d6; --s-juni:#eb6834; --s-tot:#4a3aa7; --s-bar:#2a78d6; --kpi-accent:#2a78d6;
+    --good:#006300; --s-l0:#2a78d6; --s-l1:#eb6834; --s-l2:#1f9d6a; --s-l3:#c2417f; --s-tot:#4a3aa7; --s-bar:#2a78d6; --kpi-accent:#2a78d6;
   }
   :root[data-theme="dark"]{
     --page:#0d0d0d; --surface:#1a1a19; --text-primary:#ffffff; --text-secondary:#c3c2b7;
     --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
-    --good:#0ca30c; --s-prim:#3987e5; --s-juni:#d95926; --s-tot:#9085e9; --s-bar:#3987e5; --kpi-accent:#3987e5;
+    --good:#0ca30c; --s-l0:#3987e5; --s-l1:#d95926; --s-l2:#2fb37d; --s-l3:#d9609a; --s-tot:#9085e9; --s-bar:#3987e5; --kpi-accent:#3987e5;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -57,7 +57,6 @@
   .kpi .val .u{font-size:15px; font-weight:600; color:var(--text-secondary); margin-left:3px;}
   .kpi .delta{font-size:12.5px; margin-top:8px; color:var(--good); font-weight:600;}
   .kpi .delta.flat{color:var(--muted); font-weight:400;}
-  .kpi .delta .base{color:var(--muted); font-weight:400;}
   .charts2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
   .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 18px 14px;}
   .card h3{font-size:14.5px; margin:0 0 2px; font-weight:700;}
@@ -78,11 +77,6 @@
   .tt .tt-row{display:flex; align-items:center; gap:7px; margin:2px 0; white-space:nowrap;}
   .tt .tt-row .nm{color:var(--text-secondary); flex:1;}
   .tt .tt-row .nv{font-weight:700; font-variant-numeric:tabular-nums;}
-  .tbl-controls{display:flex; gap:8px; align-items:center; margin-bottom:12px;}
-  .seg{display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden;}
-  .seg button{border:0; background:var(--surface); color:var(--text-secondary); font-size:12.5px;
-    padding:6px 14px; cursor:pointer; font-family:inherit;}
-  .seg button.on{background:var(--kpi-accent); color:#fff; font-weight:600;}
   .tbl-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface);}
   table{border-collapse:collapse; width:100%; font-size:12.5px; font-variant-numeric:tabular-nums;}
   thead th{position:sticky; top:0; background:var(--surface);}
@@ -98,6 +92,7 @@
   tfoot td.name{font-weight:700;}
   .zero{color:var(--muted);}
   .up{color:var(--good); font-weight:700;}
+  .down{color:var(--s-l1); font-weight:700;}
   .flat{color:var(--muted);}
   .date-list{display:flex; flex-direction:column; gap:8px;}
   .date-item{display:grid; grid-template-columns:96px 1fr auto 18px; align-items:center; gap:16px;
@@ -108,12 +103,12 @@
   .di-stat{font-size:13.5px; color:var(--text-secondary); font-variant-numeric:tabular-nums;}
   .di-delta{font-size:12.5px; color:var(--good); font-weight:600; text-align:right; font-variant-numeric:tabular-nums;}
   .di-delta.base{color:var(--muted); font-weight:400;}
+  .di-delta.neg{color:var(--s-l1);}
   .di-arrow{font-size:18px; color:var(--muted); text-align:right;}
   .back-btn{background:var(--surface); border:1px solid var(--border); border-radius:8px;
     padding:7px 14px; cursor:pointer; font-family:inherit; color:var(--text-secondary); font-size:13px;}
   .back-btn:hover{color:var(--text-primary); border-color:var(--kpi-accent);}
   footer.rpt{margin-top:40px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;}
-  footer.rpt code{background:var(--grid); padding:1px 5px; border-radius:4px; font-size:11.5px;}
   @media (max-width:820px){
     .kpis{grid-template-columns:repeat(2,1fr);}
     .day-kpis{grid-template-columns:repeat(2,1fr);}
@@ -125,13 +120,12 @@
     :root{
       --page:#ffffff; --surface:#ffffff; --text-primary:#0b0b0b; --text-secondary:#52514e;
       --muted:#898781; --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.18);
-      --good:#006300; --s-prim:#2a78d6; --s-juni:#eb6834; --s-tot:#4a3aa7; --s-bar:#2a78d6; --kpi-accent:#2a78d6;
+      --good:#006300; --s-l0:#2a78d6; --s-l1:#eb6834; --s-l2:#1f9d6a; --s-l3:#c2417f; --s-tot:#4a3aa7; --s-bar:#2a78d6; --kpi-accent:#2a78d6;
     }
     body{background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
     .theme-toggle{display:none;}
     .card,.kpi,.tbl-scroll,section,tr{break-inside:avoid;}
     .tbl-scroll{overflow:visible;}
-    .charts2{grid-template-columns:1fr 1fr;}
   }
 </style>
 </head>
@@ -148,12 +142,8 @@
   <div id="viewList">
     <section>
       <h2>每日累積趨勢總覽</h2>
-      <p class="note">折線維持在「日間部／進修部／總計」層級；橫軸為所有有資料的日期。左圖累積校數，右圖累積班級數。滑鼠移入可查看各日數值。</p>
-      <div class="legend">
-        <span><i class="swatch" style="background:var(--s-prim)"></i>日間部</span>
-        <span><i class="swatch" style="background:var(--s-juni)"></i>進修部</span>
-        <span><i class="swatch" style="background:var(--s-tot)"></i>總計</span>
-      </div>
+      <p class="note">折線維持在「<span class="js-levels"></span>／總計」層級；橫軸為所有有資料的日期。左圖累積校數，右圖累積班級數。滑鼠移入可查看各日數值。</p>
+      <div class="legend" id="legend"></div>
       <div class="charts2">
         <div class="card"><h3>累積校數</h3><p class="h-note">不重複學校代碼數</p><div id="chartSchools"></div></div>
         <div class="card"><h3>累積班級數</h3><p class="h-note">學校—班級配對列數</p><div id="chartClasses"></div></div>
@@ -181,28 +171,28 @@
     </section>
     <section>
       <h2>當日方言別班級數前 10 大</h2>
-      <p class="note">依該日累積班級數排序，橫向長條。數值為日間部＋進修部合計班級數。</p>
+      <p class="note">依該日累積班級數排序，橫向長條。數值為<span class="js-levels-plus"></span>合計班級數。</p>
       <div class="card"><div id="dayBar"></div></div>
     </section>
     <section>
       <h2>當日方言別明細</h2>
-      <p class="note">該日各方言別（原住民族語文-方言別）× 日間部／進修部／小計 的校數與班級數，末欄為較前一日班級增減（首日顯示 -）。</p>
+      <p class="note">該日各方言別（原住民族語文-方言別）× <span class="js-levels"></span>／小計 的校數與班級數，末欄為較前一日班級增減（首日顯示 -）。</p>
       <div class="tbl-scroll"><table id="dayTbl"></table></div>
     </section>
   </div>
 
   <footer class="rpt">
-    <p>本頁為兩層結構：列表頁看跨日趨勢與各日概況，點日期進入單日報告。資料來源：後台「115學年度第五階段選課清單【全】（不含取消選課）」每日原始快照；同一天有多份快照時採當日較晚版本為準。<br>
-    計算規則：校數＝分組內不重複「學校代碼」數；班級數＝分組資料列數；教育階段取「學校級別」欄位；方言別取「原住民族語文-方言別」欄位；僅計語文別＝原住民族語文。<br>
-    交叉驗證：日間部／進修部彙總逐日對上既定基準；各方言別班級數加總＝日間部＋進修部彙總；每分組校數 ≤ 班級數；逐日累積數皆遞增。<br>
-    本報表由 generate_report.ps1 於 <span class="js-genat"></span> 自動產生。</p>
+    <p>本頁為兩層結構：列表頁看跨日趨勢與各日概況，點日期進入單日報告。資料來源：後台「115學年度第五階段選課清單【全】（不含取消選課）」每日原始快照；同一天有多次擷取時以當日最後一次為準。<br>
+    計算規則：校數＝分組內不重複「學校代碼」數；班級數＝分組資料列數；教育階段取「學校級別」欄位；方言別取「原住民族語文-方言別」欄位；僅計語文別＝原住民族語文；總計＝各學校級別相加。<br>
+    交叉驗證：各方言別班級數加總＝各學校級別彙總；每分組校數 ≤ 班級數。<br>
+    本報表由 Google Apps Script 於 <span class="js-genat"></span> 自動產生。</p>
   </footer>
 </div>
 
 <div class="tt" id="tooltip"></div>
 
 <script>
-const DATA = {"dateLabels":["11/23"],"periodText":"2026 年 11 月 23 日 – 11 月 23 日","nPoints":1,"genAt":"2026-11-23 20:36","primSchools":[8],"primClasses":[14],"juniSchools":[0],"juniClasses":[0],"totSchools":[8],"totClasses":[14],"dialects":[{"name":"海岸阿美語","days":[[4,5,0,0]],"latestClasses":5,"latestSchools":4},{"name":"賽考利克泰雅語","days":[[2,2,0,0]],"latestClasses":2,"latestSchools":2},{"name":"賽夏語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"南王卑南語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"知本卑南語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"東排灣語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"秀姑巒阿美語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"卡那卡那富語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"太魯閣語","days":[[1,1,0,0]],"latestClasses":1,"latestSchools":1}]};
+const DATA = {"dateLabels":["11/23","11/24"],"periodText":"2026 年 11 月 23 日 – 11 月 24 日","nPoints":2,"genAt":"2026-11-24 16:01","levels":[{"name":"高中職日間部","label":"日間部","color":"--s-l0","schools":[8,10],"classes":[14,19]},{"name":"高中職進修部","label":"進修部","color":"--s-l1","schools":[0,0],"classes":[0,0]}],"totSchools":[8,10],"totClasses":[14,19],"dialects":[{"name":"02秀姑巒阿美語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"03海岸阿美語","days":[[4,5,0,0],[5,6,0,0]],"latestClasses":6,"latestSchools":5},{"name":"06賽考利克泰雅語","days":[[2,2,0,0],[2,2,0,0]],"latestClasses":2,"latestSchools":2},{"name":"07澤敖利泰雅語","days":[[0,0,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"13賽夏語","days":[[1,1,0,0],[2,2,0,0]],"latestClasses":2,"latestSchools":2},{"name":"22郡群布農語","days":[[0,0,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"23東排灣語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"24北排灣語","days":[[0,0,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"33太魯閣語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"36卡那卡那富語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"38南王卑南語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1},{"name":"39知本卑南語","days":[[1,1,0,0],[1,1,0,0]],"latestClasses":1,"latestSchools":1}]};
 function cssv(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 const NS="http://www.w3.org/2000/svg";
 function el(tag,attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -215,13 +205,16 @@ function showTip(html,x,y){
   tooltip.style.left=px+'px'; tooltip.style.top=py+'px';
 }
 function hideTip(){ tooltip.style.opacity='0'; }
+const LV=DATA.levels;
+function signed(n){ return n>0?('+'+n):String(n); }
 function fillDynamic(){
-  const n=DATA.dateLabels.length-1;
   document.querySelectorAll('.js-period').forEach(e=>e.textContent=DATA.periodText);
   document.querySelectorAll('.js-npoints').forEach(e=>e.textContent=DATA.nPoints);
-  document.querySelectorAll('.js-lastdate').forEach(e=>e.textContent=DATA.dateLabels[n]);
-  document.querySelectorAll('.js-firstdate').forEach(e=>e.textContent=DATA.dateLabels[0]);
   document.querySelectorAll('.js-genat').forEach(e=>e.textContent=DATA.genAt);
+  document.querySelectorAll('.js-levels').forEach(e=>e.textContent=LV.map(l=>l.label).join('／'));
+  document.querySelectorAll('.js-levels-plus').forEach(e=>e.textContent=LV.map(l=>l.label).join('＋'));
+  document.getElementById('legend').innerHTML=LV.map(l=>`<span><i class="swatch" style="background:var(${l.color})"></i>${l.label}</span>`).join('')
+    +'<span><i class="swatch" style="background:var(--s-tot)"></i>總計</span>';
 }
 function lineChart(mountId, series, dates){
   const mount=document.getElementById(mountId); mount.innerHTML='';
@@ -256,8 +249,8 @@ function lineChart(mountId, series, dates){
   const hoverDots=series.map(s=>{ const c=el('circle',{r:5,fill:cssv(s.color),stroke:cssv('--surface'),'stroke-width':2,opacity:0}); svg.appendChild(c); return c;});
   dates.forEach((d,i)=>{
     const denom=(dates.length-1)||1;
-    const bx = mL + (i===0?0:plotW*(i-0.5)/denom);
-    const bw = (plotW/denom)*((i===0||i===dates.length-1)?0.5:1);
+    const bx = dates.length===1 ? mL : mL + (i===0?0:plotW*(i-0.5)/denom);
+    const bw = dates.length===1 ? plotW : (plotW/denom)*((i===0||i===dates.length-1)?0.5:1);
     const band=el('rect',{x:bx,y:mT,width:Math.max(bw,1),height:plotH,fill:'transparent'});
     band.style.cursor='crosshair';
     band.addEventListener('mousemove',ev=>{
@@ -273,6 +266,7 @@ function lineChart(mountId, series, dates){
 }
 function barItems(mountId, items){
   const mount=document.getElementById(mountId); mount.innerHTML='';
+  if(!items.length){ mount.innerHTML='<p class="note" style="margin:0">（當日沒有資料）</p>'; return; }
   const W=760, rowH=30, mT=8, mB=8, mL=140, mR=54;
   const H=mT+mB+items.length*rowH;
   const maxV=Math.max(1,...items.map(i=>i.value));
@@ -306,16 +300,10 @@ function barItems(mountId, items){
 let curDay=null;
 
 function drawTrend(){
-  lineChart('chartSchools',[
-    {name:'日間部',color:'--s-prim',values:DATA.primSchools},
-    {name:'進修部',color:'--s-juni',values:DATA.juniSchools},
-    {name:'總計',color:'--s-tot',values:DATA.totSchools}
-  ],DATA.dateLabels);
-  lineChart('chartClasses',[
-    {name:'日間部',color:'--s-prim',values:DATA.primClasses},
-    {name:'進修部',color:'--s-juni',values:DATA.juniClasses},
-    {name:'總計',color:'--s-tot',values:DATA.totClasses}
-  ],DATA.dateLabels);
+  lineChart('chartSchools', LV.map(l=>({name:l.label,color:l.color,values:l.schools}))
+    .concat([{name:'總計',color:'--s-tot',values:DATA.totSchools}]), DATA.dateLabels);
+  lineChart('chartClasses', LV.map(l=>({name:l.label,color:l.color,values:l.classes}))
+    .concat([{name:'總計',color:'--s-tot',values:DATA.totClasses}]), DATA.dateLabels);
 }
 
 function renderDateList(){
@@ -327,7 +315,7 @@ function renderDateList(){
     let delta;
     if(i===0){ delta='<span class="di-delta base">（資料期間基準日）</span>'; }
     else{ const ds=s-DATA.totSchools[i-1], dc=c-DATA.totClasses[i-1];
-      delta=`<span class="di-delta">較前一日 +${ds} 校　+${dc} 班</span>`; }
+      delta=`<span class="di-delta${(ds<0||dc<0)?' neg':''}">較前一日 ${signed(ds)} 校　${signed(dc)} 班</span>`; }
     html+=`<button class="date-item" data-i="${i}">
       <span class="di-date">${d}</span>
       <span class="di-stat">${s} 校 ／ ${c} 班</span>
@@ -340,14 +328,13 @@ function renderDateList(){
 
 function renderDayKPI(i){
   const prev = i>0 ? i-1 : null;
-  const rows=[
-    {lbl:'日間部 累積校數', v:DATA.primSchools[i], p:(prev!==null?DATA.primSchools[prev]:null), u:'校'},
-    {lbl:'日間部 累積班級數', v:DATA.primClasses[i], p:(prev!==null?DATA.primClasses[prev]:null), u:'班'},
-    {lbl:'進修部 累積校數', v:DATA.juniSchools[i], p:(prev!==null?DATA.juniSchools[prev]:null), u:'校'},
-    {lbl:'進修部 累積班級數', v:DATA.juniClasses[i], p:(prev!==null?DATA.juniClasses[prev]:null), u:'班'},
-    {lbl:'總計 累積校數', v:DATA.totSchools[i], p:(prev!==null?DATA.totSchools[prev]:null), u:'校'},
-    {lbl:'總計 累積班級數', v:DATA.totClasses[i], p:(prev!==null?DATA.totClasses[prev]:null), u:'班'}
-  ];
+  const rows=[];
+  LV.forEach(l=>{
+    rows.push({lbl:l.label+' 累積校數', v:l.schools[i], p:(prev!==null?l.schools[prev]:null), u:'校'});
+    rows.push({lbl:l.label+' 累積班級數', v:l.classes[i], p:(prev!==null?l.classes[prev]:null), u:'班'});
+  });
+  rows.push({lbl:'總計 累積校數', v:DATA.totSchools[i], p:(prev!==null?DATA.totSchools[prev]:null), u:'校'});
+  rows.push({lbl:'總計 累積班級數', v:DATA.totClasses[i], p:(prev!==null?DATA.totClasses[prev]:null), u:'班'});
   document.getElementById('dayKpis').innerHTML=rows.map(r=>{
     let deltaCls='delta', deltaTxt;
     if(r.p===null){ deltaCls='delta flat'; deltaTxt='基準日（無前一日可比）'; }
@@ -362,8 +349,11 @@ function renderDayKPI(i){
   }).join('');
 }
 
+function dlSum(day, odd){ let s=0; for(let k=0;k<LV.length;k++) s+=day[2*k+odd]; return s; }
+
 function dayBar(i){
-  const items=DATA.dialects.map(d=>({name:d.name, value:d.days[i][1]+d.days[i][3], schools:d.days[i][0]+d.days[i][2]}))
+  const items=DATA.dialects.map(d=>({name:d.name, value:dlSum(d.days[i],1), schools:dlSum(d.days[i],0)}))
+    .filter(it=>it.value>0)
     .sort((a,b)=> b.value-a.value || (a.name<b.name?-1:1)).slice(0,10);
   barItems('dayBar', items);
 }
@@ -371,36 +361,40 @@ function dayBar(i){
 function renderDayTable(i){
   const prev = i>0 ? i-1 : null;
   const rows=DATA.dialects.map(d=>{
-    const cur=d.days[i]; const cCur=cur[1]+cur[3];
-    const cPrev = (prev!==null)? (d.days[prev][1]+d.days[prev][3]) : null;
+    const cur=d.days[i]; const cCur=dlSum(cur,1);
+    const cPrev = (prev!==null)? dlSum(d.days[prev],1) : null;
     return {name:d.name, cur:cur, cCur:cCur, cPrev:cPrev};
-  }).sort((a,b)=> b.cCur-a.cCur || (a.name<b.name?-1:1));
-  let head=`<thead><tr><th class="namehd" rowspan="2">方言別</th>
-    <th class="grp" colspan="2">日間部</th><th class="grp" colspan="2">進修部</th><th class="grp" colspan="2">小計</th>
-    <th rowspan="2">較前一日<br>班級增減</th></tr>
-    <tr><th class="sub">校</th><th>班</th><th class="sub">校</th><th>班</th><th class="sub">校</th><th>班</th></tr></thead>`;
+  }).filter(r=> r.cCur>0 || (r.cPrev!==null && r.cPrev>0))
+    .sort((a,b)=> b.cCur-a.cCur || (a.name<b.name?-1:1));
+  let head=`<thead><tr><th class="namehd" rowspan="2">方言別</th>`
+    + LV.map(l=>`<th class="grp" colspan="2">${l.label}</th>`).join('')
+    + `<th class="grp" colspan="2">小計</th><th rowspan="2">較前一日<br>班級增減</th></tr><tr>`
+    + LV.map(()=>'<th class="sub">校</th><th>班</th>').join('')
+    + `<th class="sub">校</th><th>班</th></tr></thead>`;
   let body='<tbody>';
   rows.forEach(r=>{
-    const pS=r.cur[0], pC=r.cur[1], jS=r.cur[2], jC=r.cur[3], sS=pS+jS, sC=pC+jC;
+    let cells='';
+    for(let k=0;k<LV.length;k++){ const s=r.cur[2*k], c=r.cur[2*k+1];
+      cells+=`<td class="${s?'':'zero'}">${s}</td><td class="${c?'':'zero'}">${c}</td>`; }
+    const sS=dlSum(r.cur,0), sC=r.cCur;
     let dcell;
     if(r.cPrev===null){ dcell='<span class="flat">-</span>'; }
     else{ const dd=sC-r.cPrev;
       if(dd>0) dcell=`<span class="up">+${dd}</span>`;
       else if(dd===0) dcell='<span class="flat">0</span>';
-      else dcell=`<span class="up" style="color:var(--s-juni)">${dd}</span>`;
+      else dcell=`<span class="down">${dd}</span>`;
     }
-    body+=`<tr><td class="name">${r.name}</td>
-      <td class="${pS?'':'zero'}">${pS}</td><td class="${pC?'':'zero'}">${pC}</td>
-      <td class="${jS?'':'zero'}">${jS}</td><td class="${jC?'':'zero'}">${jC}</td>
+    body+=`<tr><td class="name">${r.name}</td>${cells}
       <td class="${sS?'':'zero'}">${sS}</td><td class="${sC?'':'zero'}"><b>${sC}</b></td>
       <td>${dcell}</td></tr>`;
   });
   body+='</tbody>';
-  const pfS=DATA.primSchools[i], pfC=DATA.primClasses[i], jfS=DATA.juniSchools[i], jfC=DATA.juniClasses[i];
-  const foot=`<tfoot><tr><td class="name">彙總</td>
-    <td>${pfS}</td><td>${pfC}</td><td>${jfS}</td><td>${jfC}</td>
-    <td>${pfS+jfS}</td><td>${pfC+jfC}</td>
-    <td>${prev!==null?('+'+((pfC+jfC)-(DATA.primClasses[prev]+DATA.juniClasses[prev]))):'<span class="flat">-</span>'}</td></tr></tfoot>`;
+  let fcells='';
+  LV.forEach(l=>{ fcells+=`<td>${l.schools[i]}</td><td>${l.classes[i]}</td>`; });
+  const tC=DATA.totClasses[i];
+  const foot=`<tfoot><tr><td class="name">彙總</td>${fcells}
+    <td>${DATA.totSchools[i]}</td><td>${tC}</td>
+    <td>${prev!==null?signed(tC-DATA.totClasses[prev]):'<span class="flat">-</span>'}</td></tr></tfoot>`;
   document.getElementById('dayTbl').innerHTML=head+body+foot;
 }
 
